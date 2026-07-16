@@ -21,3 +21,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+# 라이선스 (한국어 번역본)
+
+MIT 라이선스
+
+Copyright (c) 2026
+
+본 소프트웨어와 관련 문서 파일(이하 "소프트웨어")의 사본을 취득하는 모든 사람에게,
+소프트웨어를 제한 없이 사용할 수 있는 권한을 무상으로 부여합니다. 여기에는 소프트웨어를
+사용, 복제, 수정, 병합, 게시, 배포, 재라이선스 및/또는 판매할 권리와, 소프트웨어를
+제공받은 사람에게 동일한 권리를 허용할 권리가 포함되며, 다음 조건을 따릅니다:
+
+위 저작권 표시와 본 허가 표시는 소프트웨어의 모든 사본 또는 중요한 부분에 포함되어야
+합니다.
+
+소프트웨어는 상품성, 특정 목적에의 적합성 및 비침해에 대한 보증을 포함하되 이에 국한되지
+않는 어떠한 종류의 명시적 또는 묵시적 보증도 없이 "있는 그대로" 제공됩니다. 어떠한
+경우에도 저작자 또는 저작권자는 계약, 불법행위 또는 그 밖의 행위로 인해 발생하는,
+소프트웨어 또는 소프트웨어의 사용이나 기타 취급과 관련하여 발생하는 어떠한 청구, 손해
+또는 기타 책임에 대해서도 책임지지 않습니다.
+
+> 본 번역본은 이해를 돕기 위한 참고용이며, 법적 효력은 위 영문 원문을 따릅니다.
