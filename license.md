@@ -1,47 +1,44 @@
-# License
+# 사용 약관 (End User License Agreement)
 
-MIT License
+Copyright (c) 2026 EKH0902. All rights reserved. (모든 권리 보유)
 
-Copyright (c) 2026
+본 소프트웨어(이하 "소프트웨어")는 저작권자 EKH0902의 독점 자산입니다. 본 소프트웨어를
+설치, 복사, 실행 또는 어떠한 방식으로든 사용하는 행위는 아래 모든 조항에 대한 완전하고
+무조건적인 동의로 간주됩니다.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 1. 약관 동의 (필수)
+- 본 약관에 동의하지 않는 경우, 귀하는 소프트웨어를 **어떠한 목적으로도 사용할 수 없으며**,
+  설치·복사·실행이 **전면 금지**됩니다.
+- 약관에 동의하지 않은 상태에서의 모든 사용은 무단·불법 사용으로 간주됩니다.
+- 소프트웨어를 실행하는 순간 본 약관 전체에 동의한 것으로 간주되며, 동의하지 않는다면
+  즉시 사용을 중단하고 모든 사본을 삭제해야 합니다.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## 2. 책임의 한계 및 사용자 부담
+- 본 소프트웨어는 **"있는 그대로(AS IS)"** 제공되며, 명시적이든 묵시적이든 어떠한 종류의
+  보증도 제공하지 않습니다.
+- 소프트웨어의 실행 또는 사용으로 인해 발생하는 **모든 결과, 손해, 손실, 데이터 손실,
+  시스템 손상, 재부팅 등 일체의 영향은 전적으로 사용자 본인의 책임과 부담**으로 합니다.
+- 저작권자는 소프트웨어의 사용 또는 사용 불능으로 인해 발생하는 어떠한 직접적·간접적·
+  부수적·특별·결과적 손해에 대해서도 **일절 책임지지 않습니다.**
+- 특히 `reboot` 기능은 컴퓨터를 즉시 재부팅하며, 이로 인한 저장되지 않은 데이터 손실 등의
+  결과에 대한 책임은 사용자에게 있습니다.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 3. 저작권 및 금지 행위
+다음 행위는 사전 서면 허가 없이는 **절대적으로 금지**됩니다:
+- 소프트웨어의 **2차 배포**(재배포, 공유, 판매, 대여, 게시 등 어떠한 형태의 배포도 포함)
+- 소프트웨어의 **수정, 변경, 번역, 파생물 제작**
+- **리버스 엔지니어링, 디컴파일, 디스어셈블** 또는 소스코드 추출 시도
+- 저작권 표시 또는 본 약관의 제거·변경
+- 그 밖에 저작권법에 위배되는 일체의 행위
+
+위 금지 행위를 위반할 경우 본 약관에 따른 사용 권리는 **즉시 자동으로 종료**되며,
+저작권자는 관련 법률에 따라 민·형사상 책임을 물을 수 있습니다.
+
+## 4. 권리의 유보
+본 약관에서 명시적으로 부여하지 않은 모든 권리는 저작권자 EKH0902에게 유보됩니다.
 
 ---
 
-# 라이선스 (한국어 번역본)
-
-MIT 라이선스
-
-Copyright (c) 2026
-
-본 소프트웨어와 관련 문서 파일(이하 "소프트웨어")의 사본을 취득하는 모든 사람에게,
-소프트웨어를 제한 없이 사용할 수 있는 권한을 무상으로 부여합니다. 여기에는 소프트웨어를
-사용, 복제, 수정, 병합, 게시, 배포, 재라이선스 및/또는 판매할 권리와, 소프트웨어를
-제공받은 사람에게 동일한 권리를 허용할 권리가 포함되며, 다음 조건을 따릅니다:
-
-위 저작권 표시와 본 허가 표시는 소프트웨어의 모든 사본 또는 중요한 부분에 포함되어야
-합니다.
-
-소프트웨어는 상품성, 특정 목적에의 적합성 및 비침해에 대한 보증을 포함하되 이에 국한되지
-않는 어떠한 종류의 명시적 또는 묵시적 보증도 없이 "있는 그대로" 제공됩니다. 어떠한
-경우에도 저작자 또는 저작권자는 계약, 불법행위 또는 그 밖의 행위로 인해 발생하는,
-소프트웨어 또는 소프트웨어의 사용이나 기타 취급과 관련하여 발생하는 어떠한 청구, 손해
-또는 기타 책임에 대해서도 책임지지 않습니다.
-
-> 본 번역본은 이해를 돕기 위한 참고용이며, 법적 효력은 위 영문 원문을 따릅니다.
+> ⚠️ 본 문서는 저작권자의 의사를 반영한 사용 약관이며, 법률 자문이 아닙니다. 실제 법적
+> 효력과 집행 가능성은 관할 지역의 법률에 따라 달라질 수 있으므로, 필요 시 변호사 등
+> 전문가의 검토를 받으시기 바랍니다.
