@@ -1,34 +1,52 @@
 # 2739
 
-Windows용 소규모 C 프로그램 모음과 Python 실행 스크립트입니다.
+Windows용 소규모 프로그램 모음과 이를 exe로 빌드·패키징하는 스크립트입니다.
 
-## 구성
-| 파일 | 설명 |
-| --- | --- |
-| `main.c` | "Hello, world!" 출력 |
-| `effect.c` | "effect" 출력 |
-| `effect2.c` | "effect2" 출력 |
-| `start.c` | "start" 출력 |
-| `reboot.c` | 실행 시 즉시 재부팅 (Windows) — **수동 실행 전용** |
-| `start.py` | Python 실행 스크립트 |
-| `license.md` | 사용 약관 (EULA) |
+## 구성 프로그램
+| 소스 | 설명 | 시작프로그램 등록 |
+| --- | --- | --- |
+| `main.c` | "Hello, world!" 출력 | O |
+| `effect.c` | "effect" 출력 | O |
+| `effect2.c` | "effect2" 출력 | O |
+| `start.c` | "start" 출력 | O |
+| `reboot.c` | 실행 시 즉시 재부팅 (Windows) | **X (수동 실행 전용)** |
+| `start.py` | Python 실행 스크립트 | - |
 
-> `reboot`은 실행 즉시 컴퓨터를 재부팅합니다. 저장하지 않은 데이터가 손실될 수 있으니 주의하세요.
+> `reboot`은 의도적으로 시작프로그램에서 제외됩니다. (부팅마다 재부팅되는 부트루프 방지)
+> 실행 즉시 재부팅되므로 저장하지 않은 데이터가 손실될 수 있으니 주의하세요.
 
-## 빌드 & 실행
-각 C 프로그램은 표준 C 컴파일러로 빌드합니다.
+## 빌드
+각 C 프로그램을 Windows `.exe`로 컴파일합니다. 산출물은 `dist/`에 생성됩니다.
 
-```bash
-# 예: main.c 빌드 후 실행
-gcc main.c -o main
-./main
+```
+python build.py
 ```
 
-Windows용 exe로 크로스컴파일(Linux)하려면 mingw-w64를 사용합니다.
+- Windows: 네이티브 `gcc`/`cc` 사용
+- Linux/기타: `x86_64-w64-mingw32-gcc`(mingw-w64) 크로스컴파일로 Windows exe 생성
 
-```bash
-x86_64-w64-mingw32-gcc main.c -o main.exe
+## 시작프로그램 등록 (Windows)
+`reboot`을 제외한 모든 프로그램을 현재 사용자 `Run` 레지스트리 키에 등록합니다.
+
 ```
+python install.py            # 등록
+python install.py --uninstall  # 해제
+```
+
+## 단일 exe로 패키징 (Windows에서 실행)
+설치 프로그램과 빌드된 exe들을 하나의 `.exe`로 묶습니다.
+
+```
+python build.py
+pip install pyinstaller
+python package.py
+# -> dist/app2739.exe
+```
+
+`app2739.exe`를 실행하면 번들된 프로그램들을 영구 설치 경로(`%LOCALAPPDATA%\app2739`)로
+복사한 뒤 `reboot`을 제외하고 시작프로그램으로 등록합니다.
+
+> 단일 exe는 PyInstaller 특성상 **Windows에서 빌드해야** Windows용 exe가 나옵니다.
 
 ## 라이선스
 본 소프트웨어는 독점 사용 약관(EULA)을 따릅니다. 자세한 내용은 [`license.md`](license.md)를 참고하세요.
