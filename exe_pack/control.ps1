@@ -1,18 +1,30 @@
 Add-Type -AssemblyName System.Windows.Forms
 
-$targets = @("start", "main", "effect", "effect2")
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$targets = @{
+    "start"   = Join-Path $scriptDir "start.exe"
+    "main"    = Join-Path $scriptDir "main.exe"
+    "effect"  = Join-Path $scriptDir "effect.exe"
+    "effect2" = Join-Path $scriptDir "effect2.exe"
+}
+
+function Get-TargetProcs($exePath) {
+    Get-Process -ErrorAction SilentlyContinue | Where-Object {
+        try { $_.MainModule.FileName -eq $exePath } catch { $false }
+    }
+}
 
 $running = @{}
-foreach ($name in $targets) {
-    $procs = Get-Process -Name $name -ErrorAction SilentlyContinue
+foreach ($name in $targets.Keys) {
+    $procs = Get-TargetProcs $targets[$name]
     if ($procs) { $running[$name] = $true }
 }
 
 while ($true) {
     Start-Sleep -Seconds 2
 
-    foreach ($name in $targets) {
-        $procs = Get-Process -Name $name -ErrorAction SilentlyContinue
+    foreach ($name in $targets.Keys) {
+        $procs = Get-TargetProcs $targets[$name]
         $wasRunning = $running.ContainsKey($name) -and $running[$name]
 
         if ($wasRunning -and -not $procs) {
