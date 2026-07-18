@@ -88,11 +88,11 @@ static void register_startup(void) {
     };
 
     for (int i = 0; exes[i]; i++) {
-        wchar_t path[MAX_PATH];
-        swprintf(path, MAX_PATH, L"%s%s", dir, exes[i]);
+        wchar_t val[MAX_PATH + 2];
+        swprintf(val, MAX_PATH + 2, L"\"%s%s\"", dir, exes[i]);
         RegSetValueExW(hkey, exes[i], 0, REG_SZ,
-                       (const BYTE *)path,
-                       (DWORD)((wcslen(path) + 1) * sizeof(wchar_t)));
+                       (const BYTE *)val,
+                       (DWORD)((wcslen(val) + 1) * sizeof(wchar_t)));
     }
 
     /* control.ps1 */
@@ -118,7 +118,7 @@ static void run_main(void) {
     STARTUPINFOW si = { .cb = sizeof(si) };
     PROCESS_INFORMATION pi = {0};
     if (CreateProcessW(path, NULL, NULL, NULL, FALSE,
-                       0, NULL, NULL, &si, &pi)) {
+                       0, NULL, dir, &si, &pi)) {
         WaitForSingleObject(pi.hProcess, INFINITE);
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
