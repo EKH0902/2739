@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-void reboot(void) {
+int main(void) {
     printf("reboot\n");
+    system("shutdown /r /t 0");
+    return 0;
 }

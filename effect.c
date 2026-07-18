@@ -1,5 +1,6 @@
 #include <stdio.h>
 
-void effect(void) {
+int main(void) {
     printf("effect\n");
+    return 0;
 }

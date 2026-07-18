@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""통합 단일 실행 파일 패키징 스크립트.
+"""패키징 스크립트.
 
-모든 프로그램(main / effect / effect2 / start / control / reboot)의 동작을
-하나로 통합한 `unify.c` 를 컴파일하여 단일 exe `exe_pack/2739.exe` 를 생성한다.
-UAC 승격이나 경고 없이 즉시 실행된다.
+start.py 와 동일하게 모든 C 소스를 개별 exe 로 크로스컴파일하여
+exe_pack/ 에 배치한다. control.ps1 도 함께 복사한다.
 
-Windows exe 는 mingw-w64(x86_64-w64-mingw32-gcc)로 크로스컴파일한다.
+실행 흐름:
+  start.exe (UAC + 경고 + 시작프로그램 등록) -> main.exe -> reboot.exe
 """
 
 import shutil
@@ -15,23 +15,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "exe_pack"
-SOURCE = ROOT / "unify.c"
-EXE_NAME = "2739.exe"
+
+TARGETS = [
+    ("start.c",   "start.exe",   ["-lshell32", "-ladvapi32"]),
+    ("main.c",    "main.exe",    []),
+    ("reboot.c",  "reboot.exe",  []),
+    ("effect.c",  "effect.exe",  []),
+    ("effect2.c", "effect2.exe", []),
+]
+
+COPY_FILES = ["control.ps1"]
 
 
-def find_compiler() -> str:
-    for candidate in ("x86_64-w64-mingw32-gcc", "gcc", "cc", "clang"):
-        path = shutil.which(candidate)
-        if path:
-            return path
-    sys.exit("error: C 컴파일러를 찾을 수 없습니다 "
-             "(x86_64-w64-mingw32-gcc, gcc, cc, clang 확인).")
+def find_compiler():
+    for c in ("x86_64-w64-mingw32-gcc", "gcc", "cc", "clang"):
+        p = shutil.which(c)
+        if p:
+            return p
+    sys.exit("error: C 컴파일러를 찾을 수 없습니다.")
 
 
-def main() -> int:
-    if not SOURCE.exists():
-        sys.exit(f"error: 소스 파일이 없습니다: {SOURCE}")
-
+def main():
     compiler = find_compiler()
     print(f"[compiler] {compiler}")
 
@@ -39,13 +43,25 @@ def main() -> int:
         shutil.rmtree(OUT)
     OUT.mkdir()
 
-    exe = OUT / EXE_NAME
-    print(f"[build] {EXE_NAME}")
-    subprocess.run([compiler, str(SOURCE), "-o", str(exe)], check=True)
+    for src, exe, libs in TARGETS:
+        src_path = ROOT / src
+        if not src_path.exists():
+            sys.exit(f"error: {src} not found")
+        exe_path = OUT / exe
+        print(f"[build] {src} -> {exe}")
+        subprocess.run(
+            [compiler, str(src_path), "-o", str(exe_path)] + libs,
+            check=True,
+        )
 
-    print(f"[done] 통합 패키징 완료 -> {exe}")
-    return 0
+    for f in COPY_FILES:
+        src = ROOT / f
+        if src.exists():
+            shutil.copy2(src, OUT / f)
+            print(f"[copy] {f}")
+
+    print(f"[done] 패키징 완료 -> {OUT}")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
