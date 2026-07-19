@@ -57,6 +57,9 @@ def main():
     rc_path = ROOT / RC_FILE
     if not rc_path.exists():
         sys.exit(f"error: {RC_FILE} not found (start.exe 매니페스트 필수).")
+    manifest_path = ROOT / "start.exe.manifest"
+    if not manifest_path.exists():
+        sys.exit("error: start.exe.manifest not found (start.exe 매니페스트 필수).")
     for src, _exe, _libs in TARGETS:
         if not (ROOT / src).exists():
             sys.exit(f"error: {src} not found")
