@@ -46,7 +46,7 @@ def find_windres():
         p = shutil.which(w)
         if p:
             return p
-    return None
+    sys.exit("error: windres를 찾을 수 없습니다 (start.exe 매니페스트 필수).")
 
 
 def main():
@@ -58,22 +58,22 @@ def main():
         shutil.rmtree(OUT)
     OUT.mkdir()
 
-    res_obj = None
     rc_path = ROOT / RC_FILE
-    if windres and rc_path.exists():
-        res_obj = OUT / "start.res.o"
-        print(f"[windres] {RC_FILE} -> start.res.o")
-        subprocess.run(
-            [windres, str(rc_path), "-o", str(res_obj)],
-            check=True, cwd=str(ROOT),
-        )
+    if not rc_path.exists():
+        sys.exit(f"error: {RC_FILE} not found (start.exe 매니페스트 필수).")
+    res_obj = OUT / "start.res.o"
+    print(f"[windres] {RC_FILE} -> start.res.o")
+    subprocess.run(
+        [windres, str(rc_path), "-o", str(res_obj)],
+        check=True, cwd=str(ROOT),
+    )
 
     for src, exe, libs in TARGETS:
         src_path = ROOT / src
         if not src_path.exists():
             sys.exit(f"error: {src} not found")
         exe_path = OUT / exe
-        extra = [str(res_obj)] if (res_obj and src == "start.c") else []
+        extra = [str(res_obj)] if src == "start.c" else []
         print(f"[build] {src} -> {exe}")
         subprocess.run(
             [compiler, str(src_path)] + extra + ["-o", str(exe_path)] + libs,
