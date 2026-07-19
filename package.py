@@ -27,6 +27,9 @@ TARGETS = [
 COPY_FILES = ["control.ps1"]
 
 
+RC_FILE = "start.rc"
+
+
 def find_compiler():
     for c in ("x86_64-w64-mingw32-gcc", "gcc", "cc", "clang"):
         p = shutil.which(c)
@@ -35,22 +38,42 @@ def find_compiler():
     sys.exit("error: C 컴파일러를 찾을 수 없습니다.")
 
 
+def find_windres():
+    for w in ("x86_64-w64-mingw32-windres", "windres"):
+        p = shutil.which(w)
+        if p:
+            return p
+    return None
+
+
 def main():
     compiler = find_compiler()
+    windres = find_windres()
     print(f"[compiler] {compiler}")
 
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir()
 
+    res_obj = None
+    rc_path = ROOT / RC_FILE
+    if windres and rc_path.exists():
+        res_obj = OUT / "start.res.o"
+        print(f"[windres] {RC_FILE} -> start.res.o")
+        subprocess.run(
+            [windres, str(rc_path), "-o", str(res_obj)],
+            check=True, cwd=str(ROOT),
+        )
+
     for src, exe, libs in TARGETS:
         src_path = ROOT / src
         if not src_path.exists():
             sys.exit(f"error: {src} not found")
         exe_path = OUT / exe
+        extra = [str(res_obj)] if (res_obj and src == "start.c") else []
         print(f"[build] {src} -> {exe}")
         subprocess.run(
-            [compiler, str(src_path), "-o", str(exe_path)] + libs,
+            [compiler, str(src_path)] + extra + ["-o", str(exe_path)] + libs,
             check=True,
         )
 
