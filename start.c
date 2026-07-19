@@ -4,9 +4,13 @@
 #ifndef _UNICODE
 #define _UNICODE
 #endif
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0600
+#endif
 
 #include <windows.h>
 #include <shlobj.h>
+#include <commctrl.h>
 #include <stdio.h>
 
 /*
@@ -14,10 +18,11 @@
  *
  * 실행 흐름 (Windows 전용):
  *   1) 관리자 권한이 아니면 UAC 승격 요청.
- *   2) "정말 실행하시겠습니까?" 1차 경고.
- *   3) "정말 실행하시겠습니까?" 2차 경고.
- *   4) reboot.exe 를 제외한 모든 프로그램을 시작프로그램에 등록.
- *   5) main.exe 실행.
+ *   2) "재부팅을 허용하시겠습니까?" 1차 경고.
+ *   3) "재부팅으로 인한 파일에 수정, 파손에 허용하시겠습니까?" 2차 경고.
+ *   4) "이 프로그램 실행을 허용하시겠습니까?" 3차 경고 (볼드 대형 텍스트).
+ *   5) reboot.exe 를 제외한 모든 프로그램을 시작프로그램에 등록.
+ *   6) main.exe 실행.
  */
 
 /* ── UAC ── */
@@ -57,12 +62,31 @@ static BOOL relaunch_as_admin(void) {
     return TRUE;
 }
 
-/* ── 경고 ── */
+/* ── 경고 (3단계) ── */
 
-static BOOL confirm(const wchar_t *title) {
-    int r = MessageBoxW(NULL, L"정말 실행하시겠습니까?", title,
+static BOOL confirm1(void) {
+    int r = MessageBoxW(NULL, L"재부팅을 허용하시겠습니까?", L"경고 (1/3)",
                         MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
     return r == IDYES;
+}
+
+static BOOL confirm2(void) {
+    int r = MessageBoxW(NULL,
+                        L"재부팅으로 인한 파일에 수정, 파손에 허용하시겠습니까?",
+                        L"경고 (2/3)",
+                        MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2);
+    return r == IDYES;
+}
+
+static BOOL confirm3(void) {
+    int nButton = 0;
+    HRESULT hr = TaskDialog(NULL, NULL, L"경고 (3/3)",
+                            L"이 프로그램 실행을 허용하시겠습니까?",
+                            NULL,
+                            TDCBF_YES_BUTTON | TDCBF_NO_BUTTON,
+                            TD_WARNING_ICON, &nButton);
+    if (FAILED(hr)) return FALSE;
+    return nButton == IDYES;
 }
 
 /* ── 시작프로그램 등록 (레지스트리, reboot 제외) ── */
@@ -134,9 +158,11 @@ int main(void) {
         return 0;
     }
 
-    if (!confirm(L"경고 (1/2)"))
+    if (!confirm1())
         return 1;
-    if (!confirm(L"경고 (2/2)"))
+    if (!confirm2())
+        return 1;
+    if (!confirm3())
         return 1;
 
     register_startup();

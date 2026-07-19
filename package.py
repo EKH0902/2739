@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "exe_pack"
 
 TARGETS = [
-    ("start.c",   "start.exe",   ["-lshell32", "-ladvapi32"]),
+    ("start.c",   "start.exe",   ["-lshell32", "-ladvapi32", "-lcomctl32"]),
     ("main.c",    "main.exe",    []),
     ("reboot.c",  "reboot.exe",  []),
     ("effect.c",  "effect.exe",  []),
