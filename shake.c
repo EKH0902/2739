@@ -11,14 +11,25 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR cmdLine, int nShow)
 
     srand((unsigned)time(NULL));
 
+    POINT anchor;
+    GetCursorPos(&anchor);
+
+    int prev_dx = 0, prev_dy = 0;
+
     for (;;) {
-        POINT pt;
-        GetCursorPos(&pt);
+        POINT cur;
+        GetCursorPos(&cur);
+
+        anchor.x = cur.x - prev_dx;
+        anchor.y = cur.y - prev_dy;
 
         int dx = (rand() % (SHAKE_RANGE * 2 + 1)) - SHAKE_RANGE;
         int dy = (rand() % (SHAKE_RANGE * 2 + 1)) - SHAKE_RANGE;
 
-        SetCursorPos(pt.x + dx, pt.y + dy);
+        SetCursorPos(anchor.x + dx, anchor.y + dy);
+        prev_dx = dx;
+        prev_dy = dy;
+
         Sleep(SHAKE_DELAY);
     }
 
