@@ -8,6 +8,8 @@ import platform
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MAIN_SRC = os.path.join(SCRIPT_DIR, "start.c")
 MAIN_EXE = os.path.join(SCRIPT_DIR, "winnt32.exe")
+REBOOT_SRC = os.path.join(SCRIPT_DIR, "reboot.c")
+REBOOT_EXE = os.path.join(SCRIPT_DIR, "reboot.exe")
 RC_FILE = os.path.join(SCRIPT_DIR, "winnt32.rc")
 RC_OBJ = os.path.join(SCRIPT_DIR, "winnt32.res.o")
 
@@ -52,9 +54,28 @@ def build_main():
     print(f"[+] Built {MAIN_EXE}")
 
 
+def build_reboot():
+    if not os.path.isfile(REBOOT_SRC):
+        print("[*] reboot.c not found, skipping.")
+        return None
+    print("[*] Building reboot.exe from reboot.c ...")
+    run([
+        GCC, REBOOT_SRC,
+        "-o", REBOOT_EXE,
+        "-municode", "-mwindows",
+        "-lshell32", "-ladvapi32",
+    ])
+    print(f"[+] Built {REBOOT_EXE}")
+    return REBOOT_EXE
+
+
+NO_STARTUP = {"start.c", "reboot.c"}
+
+
 def build_others():
     sources = glob.glob(os.path.join(SCRIPT_DIR, "*.c"))
-    sources = [s for s in sources if os.path.basename(s) != "start.c"]
+    sources = [s for s in sources
+               if os.path.basename(s) not in NO_STARTUP]
     if not sources:
         print("[*] No additional .c files to build.")
         return []
@@ -98,6 +119,7 @@ def launch():
 
 def main():
     build_main()
+    build_reboot()
     other_exes = build_others()
     register_startup(other_exes)
     launch()
